@@ -1,0 +1,278 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="Sensor_Sense" Id="{fa389c25-a045-4d57-ab3e-15214645fa9f}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK Sensor_Sense
+VAR_INPUT
+	mxEnable: BOOL;
+END_VAR
+VAR_OUTPUT
+	Product:STRING;
+	mxINVALIDPRODUCT:BOOL;
+	mxREDPLATE:BOOL;
+	mxYELLOWPLATE:BOOL;
+	mxBLUEPLATE:BOOL;
+	mxREDCYLINDER:BOOL;
+	mxYELLOWCYLINDER:BOOL;
+	mxBLUECYLINDER:BOOL;
+	mxREDOCTAGON:BOOL;
+	mxYELLOWOCTAGON:BOOL;
+	mxBLUEOCTAGON:BOOL;
+	mxREDCONTAINER:BOOL;
+	mxYELLOWCONTAINER:BOOL;
+	mxBLUECONTAINER:BOOL;
+END_VAR
+VAR
+	Sensor_Sense:BYTE;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF mxEnable THEN
+	Sensor_Sense.1:=gvl.ixInductiveSensor1;
+	Sensor_Sense.2:=gvl.ixInductiveSensor2;
+	Sensor_Sense.3:=gvl.ixInductiveSensor3;
+	Sensor_Sense.4:=gvl.ixInductiveSensor4;
+END_IF
+
+IF Sensor_Sense = 0 OR Sensor_Sense = 4 OR Sensor_Sense = 2 OR Sensor_Sense = 6 THEN
+ 	Product:='InvalidPart';
+	mxINVALIDPRODUCT:=FALSE;
+END_IF
+
+IF Sensor_Sense=16 THEN
+	Product:='Blue Container';
+	mxREDPLATE:=FALSE;
+	mxYELLOWPLATE:=FALSE;
+	mxBLUEPLATE:=FALSE;
+	mxREDCYLINDER:=FALSE;
+	mxYELLOWCYLINDER:=FALSE;
+	mxBLUECYLINDER:=FALSE;
+	mxREDOCTAGON:=FALSE;
+	mxYELLOWOCTAGON:=FALSE;
+	mxBLUEOCTAGON:=FALSE;
+	mxREDCONTAINER:=FALSE;
+	mxYELLOWCONTAINER:=FALSE;
+	mxBLUECONTAINER:=TRUE;
+	
+END_IF
+
+IF Sensor_Sense=8 THEN
+	Product:='Yellow Container';
+	mxREDPLATE:=FALSE;
+	mxYELLOWPLATE:=FALSE;
+	mxBLUEPLATE:=FALSE;
+	mxREDCYLINDER:=FALSE;
+	mxYELLOWCYLINDER:=FALSE;
+	mxBLUECYLINDER:=FALSE;
+	mxREDOCTAGON:=FALSE;
+	mxYELLOWOCTAGON:=FALSE;
+	mxBLUEOCTAGON:=FALSE;
+	mxREDCONTAINER:=FALSE;
+	mxYELLOWCONTAINER:=TRUE;
+	mxBLUECONTAINER:=FALSE;
+END_IF
+
+IF Sensor_Sense=24 THEN
+	Product:='Red Container';
+	mxREDPLATE:=FALSE;
+	mxYELLOWPLATE:=FALSE;
+	mxBLUEPLATE:=FALSE;
+	mxREDCYLINDER:=FALSE;
+	mxYELLOWCYLINDER:=FALSE;
+	mxBLUECYLINDER:=FALSE;
+	mxREDOCTAGON:=FALSE;
+	mxYELLOWOCTAGON:=FALSE;
+	mxBLUEOCTAGON:=FALSE;
+	mxREDCONTAINER:=TRUE;
+	mxYELLOWCONTAINER:=FALSE;
+	mxBLUECONTAINER:=FALSE;
+END_IF
+
+IF Sensor_Sense=20 THEN
+	Product:='Blue Cylinder';
+	mxREDPLATE:=FALSE;
+	mxYELLOWPLATE:=FALSE;
+	mxBLUEPLATE:=FALSE;
+	mxREDCYLINDER:=FALSE;
+	mxYELLOWCYLINDER:=FALSE;
+	mxBLUECYLINDER:=TRUE;
+	mxREDOCTAGON:=FALSE;
+	mxYELLOWOCTAGON:=FALSE;
+	mxBLUEOCTAGON:=FALSE;
+	mxREDCONTAINER:=FALSE;
+	mxYELLOWCONTAINER:=FALSE;
+	mxBLUECONTAINER:=FALSE;
+END_IF
+
+IF Sensor_Sense=12 THEN
+	Product:='Blue Octagon';
+	mxREDPLATE:=FALSE;
+	mxYELLOWPLATE:=FALSE;
+	mxBLUEPLATE:=FALSE;
+	mxREDCYLINDER:=FALSE;
+	mxYELLOWCYLINDER:=FALSE;
+	mxBLUECYLINDER:=FALSE;
+	mxREDOCTAGON:=FALSE;
+	mxYELLOWOCTAGON:=FALSE;
+	mxBLUEOCTAGON:=TRUE;
+	mxREDCONTAINER:=FALSE;
+	mxYELLOWCONTAINER:=FALSE;
+	mxBLUECONTAINER:=FALSE;
+END_IF
+
+IF Sensor_Sense=28 THEN
+	Product:='Blue Plate';
+	mxREDPLATE:=FALSE;
+	mxYELLOWPLATE:=FALSE;
+	mxBLUEPLATE:=TRUE;
+	mxREDCYLINDER:=FALSE;
+	mxYELLOWCYLINDER:=FALSE;
+	mxBLUECYLINDER:=FALSE;
+	mxREDOCTAGON:=FALSE;
+	mxYELLOWOCTAGON:=FALSE;
+	mxBLUEOCTAGON:=FALSE;
+	mxREDCONTAINER:=FALSE;
+	mxYELLOWCONTAINER:=FALSE;
+	mxBLUECONTAINER:=FALSE;
+END_IF
+
+IF Sensor_Sense=18 THEN
+	Product:='Yellow Cylinder';
+	mxREDPLATE:=FALSE;
+	mxYELLOWPLATE:=FALSE;
+	mxBLUEPLATE:=FALSE;
+	mxREDCYLINDER:=FALSE;
+	mxYELLOWCYLINDER:=TRUE;
+	mxBLUECYLINDER:=FALSE;
+	mxREDOCTAGON:=FALSE;
+	mxYELLOWOCTAGON:=FALSE;
+	mxBLUEOCTAGON:=FALSE;
+	mxREDCONTAINER:=FALSE;
+	mxYELLOWCONTAINER:=FALSE;
+	mxBLUECONTAINER:=FALSE;
+END_IF
+
+IF Sensor_Sense=10 THEN
+	Product:='Yellow Octagon';
+	mxREDPLATE:=FALSE;
+	mxYELLOWPLATE:=FALSE;
+	mxBLUEPLATE:=FALSE;
+	mxREDCYLINDER:=FALSE;
+	mxYELLOWCYLINDER:=FALSE;
+	mxBLUECYLINDER:=FALSE;
+	mxREDOCTAGON:=FALSE;
+	mxYELLOWOCTAGON:=TRUE;
+	mxBLUEOCTAGON:=FALSE;
+	mxREDCONTAINER:=FALSE;
+	mxYELLOWCONTAINER:=FALSE;
+	mxBLUECONTAINER:=FALSE;
+END_IF
+
+IF Sensor_Sense=26 THEN
+	Product:='Yellow Plate';
+	mxREDPLATE:=FALSE;
+	mxYELLOWPLATE:=TRUE;
+	mxBLUEPLATE:=FALSE;
+	mxREDCYLINDER:=FALSE;
+	mxYELLOWCYLINDER:=FALSE;
+	mxBLUECYLINDER:=FALSE;
+	mxREDOCTAGON:=FALSE;
+	mxYELLOWOCTAGON:=FALSE;
+	mxBLUEOCTAGON:=FALSE;
+	mxREDCONTAINER:=FALSE;
+	mxYELLOWCONTAINER:=FALSE;
+	mxBLUECONTAINER:=FALSE;
+END_IF
+
+IF Sensor_Sense=22 THEN
+	Product:='Red Cylinder';
+	mxREDPLATE:=FALSE;
+	mxYELLOWPLATE:=FALSE;
+	mxBLUEPLATE:=FALSE;
+	mxREDCYLINDER:=TRUE;
+	mxYELLOWCYLINDER:=FALSE;
+	mxBLUECYLINDER:=FALSE;
+	mxREDOCTAGON:=FALSE;
+	mxYELLOWOCTAGON:=FALSE;
+	mxBLUEOCTAGON:=FALSE;
+	mxREDCONTAINER:=FALSE;
+	mxYELLOWCONTAINER:=FALSE;
+	mxBLUECONTAINER:=FALSE;
+END_IF
+
+IF Sensor_Sense=14 THEN
+	Product:='Red Octagon';
+	mxREDPLATE:=FALSE;
+	mxYELLOWPLATE:=FALSE;
+	mxBLUEPLATE:=FALSE;
+	mxREDCYLINDER:=FALSE;
+	mxYELLOWCYLINDER:=FALSE;
+	mxBLUECYLINDER:=FALSE;
+	mxREDOCTAGON:=TRUE;
+	mxYELLOWOCTAGON:=FALSE;
+	mxBLUEOCTAGON:=FALSE;
+	mxREDCONTAINER:=FALSE;
+	mxYELLOWCONTAINER:=FALSE;
+	mxBLUECONTAINER:=FALSE;
+END_IF
+
+IF Sensor_Sense=30 THEN
+	Product:='Red Plate';
+	mxREDPLATE:=TRUE;
+	mxYELLOWPLATE:=FALSE;
+	mxBLUEPLATE:=FALSE;
+	mxREDCYLINDER:=FALSE;
+	mxYELLOWCYLINDER:=FALSE;
+	mxBLUECYLINDER:=FALSE;
+	mxREDOCTAGON:=FALSE;
+	mxYELLOWOCTAGON:=FALSE;
+	mxBLUEOCTAGON:=FALSE;
+	mxREDCONTAINER:=FALSE;
+	mxYELLOWCONTAINER:=FALSE;
+	mxBLUECONTAINER:=FALSE;
+END_IF]]></ST>
+    </Implementation>
+    <LineIds Name="Sensor_Sense">
+      <LineId Id="20" Count="8" />
+      <LineId Id="88" Count="0" />
+      <LineId Id="29" Count="2" />
+      <LineId Id="262" Count="0" />
+      <LineId Id="412" Count="10" />
+      <LineId Id="274" Count="0" />
+      <LineId Id="290" Count="0" />
+      <LineId Id="275" Count="3" />
+      <LineId Id="401" Count="10" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="37" Count="3" />
+      <LineId Id="390" Count="10" />
+      <LineId Id="97" Count="0" />
+      <LineId Id="41" Count="3" />
+      <LineId Id="379" Count="10" />
+      <LineId Id="98" Count="0" />
+      <LineId Id="45" Count="3" />
+      <LineId Id="368" Count="10" />
+      <LineId Id="99" Count="0" />
+      <LineId Id="49" Count="3" />
+      <LineId Id="357" Count="10" />
+      <LineId Id="100" Count="0" />
+      <LineId Id="53" Count="3" />
+      <LineId Id="346" Count="10" />
+      <LineId Id="101" Count="0" />
+      <LineId Id="57" Count="3" />
+      <LineId Id="335" Count="10" />
+      <LineId Id="102" Count="0" />
+      <LineId Id="61" Count="3" />
+      <LineId Id="324" Count="10" />
+      <LineId Id="103" Count="0" />
+      <LineId Id="65" Count="3" />
+      <LineId Id="313" Count="10" />
+      <LineId Id="137" Count="0" />
+      <LineId Id="69" Count="3" />
+      <LineId Id="302" Count="10" />
+      <LineId Id="134" Count="0" />
+      <LineId Id="73" Count="3" />
+      <LineId Id="133" Count="0" />
+      <LineId Id="291" Count="10" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

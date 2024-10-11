@@ -1,0 +1,1730 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="Scanner_FB" Id="{ca46032a-69db-43ab-b12e-fff7cb39dbfa}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK Scanner_FB
+VAR_INPUT
+	mxEnable: BOOL;
+	mxRP: BOOL;
+	mxYP: BOOL;
+	mxBP: BOOL;
+	mxRCy: BOOL;
+	mxYCy: BOOL;
+	mxBCy: BOOL;
+	mxYOct: BOOL;
+	mxBOct: BOOL;
+	mxROct: BOOL;
+	mxIP: BOOL;
+	mxRCon: BOOL;
+	mxYCon: BOOL;
+	mxBCon: BOOL;
+END_VAR
+VAR_OUTPUT
+	
+END_VAR
+VAR
+	TASK: INT;
+	qxScanBuffer_1:BOOL;
+	qxScanBuffer_2:BOOL;
+	qxScanBuffer_3:BOOL;
+	qxScanContainer:BOOL;
+	mxPlate: BOOL;
+	mxCylinder: BOOL;
+	mxOctagon: BOOL;
+	mxPART2: BOOL;
+	mxPART3: BOOL;
+	mxPart1: BOOL;
+	mxSLOT1: BOOL;
+	mxSLOT2: BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[CASE TASK OF
+	0:
+	
+		MAIN.ixAutoLamp:=FALSE;
+		MAIN.ixManualLamp:=FALSE;
+		MAIN.qxABBErrorLamp:=FALSE;
+		MAIN.qxABBExecutLamp:=FALSE;
+	
+		IF ABB_Control_FB.Auto_Mode.Q1 THEN
+			GVL.mwStationStatus:=0;
+			IF GVL.BufferProducts.Storage1.Quatity>0 THEN
+				TASK:=2;
+			ELSE
+				TASK:=1;
+			END_IF
+		ELSIF ABB_Control_FB.Manual_Mode.Q1 THEN
+			GVL.mwStationStatus:=400;
+			TASK:=1000;
+		ELSIF GVL.ixEmergencyStop THEN 
+						MAIN.qxEmergySTLamp:=TRUE;
+						GVL.mwStationStatus:=1000;
+						TASK:=2001;
+		END_IF
+	
+	// AUTO MODE
+	
+	// Buffers Scanning
+	1:
+		GVL.mwStationStatus:=0;
+		MAIN.qxABBExecutLamp:=TRUE;
+		ABB_Control_FB.qxScanBuffer_1:=TRUE;
+		ABB_Control_FB.mxScan:=TRUE;
+		MAIN.qsTask:='Scan buffers';
+		MAIN.qsSubTask:='Scan buffer 1';
+	
+		IF mxEnable THEN
+			IF mxRP THEN
+				GVL.BufferProducts.Storage1.Component:= 'Red Plate';
+				GVL.BufferProducts.Storage1.Quatity:=2;
+			ELSIF mxYP THEN
+				GVL.BufferProducts.Storage1.Component:= 'Yellow Plate';
+				GVL.BufferProducts.Storage1.Quatity:=2;
+			ELSIF mxBP THEN
+				GVL.BufferProducts.Storage1.Component:='Blue Plate';
+				GVL.BufferProducts.Storage1.Quatity:=2;
+			ELSIF mxRCy THEN
+				GVL.BufferProducts.Storage1.Component:= 'Red Cylinder';
+				GVL.BufferProducts.Storage1.Quatity:=4;
+			ELSIF mxYCy THEN
+				GVL.BufferProducts.Storage1.Component:= 'Yellow Cylinder';
+				GVL.BufferProducts.Storage1.Quatity:=4;
+			ELSIF mxBCy THEN
+				GVL.BufferProducts.Storage1.Component:= 'Blue Cylinder';
+				GVL.BufferProducts.Storage1.Quatity:=4;
+			ELSIF mxROct THEN
+				GVL.BufferProducts.Storage1.Component:= 'Red Octagon';
+				GVL.BufferProducts.Storage1.Quatity:=4;
+			ELSIF mxYOct THEN
+				GVL.BufferProducts.Storage1.Component:= 'Yellow Octagon';
+				GVL.BufferProducts.Storage1.Quatity:=4;
+			ELSIF mxBOct THEN
+				GVL.BufferProducts.Storage1.Component:= 'Blue Octagon';
+				GVL.BufferProducts.Storage1.Quatity:=4;
+			ELSIF mxIP THEN
+				GVL.BufferProducts.Storage1.Component:='InvalidPart';
+				GVL.BufferProducts.Storage1.Quatity:=0;
+			END_IF
+		END_IF
+		
+		IF GVL.BufferProducts.Storage1.Quatity=0 OR GVL.BufferProducts.Storage2.Quatity=0 OR GVL.BufferProducts.Storage3.Quatity=0 THEN
+			MAIN.ixEmptyBuffer:=TRUE;
+		ELSE
+			MAIN.ixEmptyBuffer:=FALSE;
+		END_IF
+		
+		IF ABB_Control_FB.mxBuffer_1_scanned THEN
+			TASK:=2;
+		END_IF
+		
+		IF
+			GVL.ixEmergencyStop THEN 
+						MAIN.qxEmergySTLamp:=TRUE;
+						GVL.mwStationStatus:=1000;
+						TASK:=2001;
+		END_IF
+	
+	2:
+		GVL.mwStationStatus:=0;
+		MAIN.qxABBExecutLamp:=TRUE;
+		ABB_Control_FB.mxScan:=FALSE;
+		ABB_Control_FB.qxScanBuffer_1:=FALSE;
+		IF GVL.BufferProducts.Storage2.Quatity>0 THEN
+			TASK:=3;
+		ELSE
+			TASK:=4;
+		END_IF
+		
+	4:
+		GVL.mwStationStatus:=0;
+		MAIN.qxABBExecutLamp:=TRUE;
+		ABB_Control_FB.mxScan:=TRUE;
+		ABB_Control_FB.qxScanBuffer_2:=TRUE;
+		MAIN.qsTask:='Scan buffers';
+		MAIN.qsSubTask:='Scan buffer 2';
+			
+		IF mxEnable THEN
+			IF mxRP THEN
+				GVL.BufferProducts.Storage2.Component:= 'Red Plate';
+				GVL.BufferProducts.Storage2.Quatity:=2;
+			ELSIF mxYP THEN
+				GVL.BufferProducts.Storage2.Component:= 'Yellow Plate';
+				GVL.BufferProducts.Storage2.Quatity:=2;
+			ELSIF mxBP THEN
+				GVL.BufferProducts.Storage2.Component:='Blue Plate';
+				GVL.BufferProducts.Storage2.Quatity:=2;
+			ELSIF mxRCy THEN
+				GVL.BufferProducts.Storage2.Component:= 'Red Cylinder';
+				GVL.BufferProducts.Storage2.Quatity:=4;
+			ELSIF mxYCy THEN
+				GVL.BufferProducts.Storage2.Component:= 'Yellow Cylinder';
+				GVL.BufferProducts.Storage2.Quatity:=4;
+			ELSIF mxBCy THEN
+				GVL.BufferProducts.Storage2.Component:= 'Blue Cylinder';
+				GVL.BufferProducts.Storage2.Quatity:=4;
+			ELSIF mxROct THEN
+				GVL.BufferProducts.Storage2.Component:= 'Red Octagon';
+				GVL.BufferProducts.Storage2.Quatity:=4;
+			ELSIF mxYOct THEN
+				GVL.BufferProducts.Storage2.Component:= 'Yellow Octagon';
+				GVL.BufferProducts.Storage2.Quatity:=4;
+			ELSIF mxBOct THEN
+				GVL.BufferProducts.Storage2.Component:= 'Blue Octagon';
+				GVL.BufferProducts.Storage2.Quatity:=4;
+			ELSIF mxIP THEN
+				GVL.BufferProducts.Storage2.Component:='InvalidPart';
+				GVL.BufferProducts.Storage2.Quatity:=0;
+			END_IF
+		END_IF
+		
+		IF GVL.BufferProducts.Storage1.Quatity=0 OR GVL.BufferProducts.Storage2.Quatity=0 OR GVL.BufferProducts.Storage3.Quatity=0 THEN
+			MAIN.ixEmptyBuffer:=TRUE;
+		ELSE
+			MAIN.ixEmptyBuffer:=FALSE;
+		END_IF
+		
+		IF ABB_Control_FB.mxBuffer_2_scanned THEN
+			TASK:=3;
+		END_IF
+		
+		IF
+			GVL.ixEmergencyStop THEN 
+						MAIN.qxEmergySTLamp:=TRUE;
+						GVL.mwStationStatus:=1000;
+						TASK:=2001;
+		END_IF
+		
+	3:
+		GVL.mwStationStatus:=0;
+		MAIN.qxABBExecutLamp:=TRUE;
+		ABB_Control_FB.mxScan:=FALSE;
+		ABB_Control_FB.qxScanBuffer_2:=FALSE;
+		IF GVL.BufferProducts.Storage3.Quatity>0 THEN
+			TASK:=5;
+		ELSE
+			TASK:=6;
+		END_IF
+	
+	6:
+		GVL.mwStationStatus:=0;
+		MAIN.qxABBExecutLamp:=TRUE;
+		ABB_Control_FB.mxScan:=TRUE;
+		ABB_Control_FB.qxScanBuffer_3:=TRUE;
+		MAIN.qsTask:='Scan buffers';
+		MAIN.qsSubTask:='Scan buffer 3';
+		
+		IF mxEnable THEN
+			IF mxRP THEN
+				GVL.BufferProducts.Storage3.Component:= 'Red Plate';
+				GVL.BufferProducts.Storage3.Quatity:=2;
+			ELSIF mxYP THEN
+				GVL.BufferProducts.Storage3.Component:= 'Yellow Plate';
+				GVL.BufferProducts.Storage3.Quatity:=2;
+			ELSIF mxBP THEN
+				GVL.BufferProducts.Storage3.Component:='Blue Plate';
+				GVL.BufferProducts.Storage3.Quatity:=2;
+			ELSIF mxRCy THEN
+				GVL.BufferProducts.Storage3.Component:= 'Red Cylinder';
+				GVL.BufferProducts.Storage3.Quatity:=4;
+			ELSIF mxYCy THEN
+				GVL.BufferProducts.Storage3.Component:= 'Yellow Cylinder';
+				GVL.BufferProducts.Storage3.Quatity:=4;
+			ELSIF mxBCy THEN
+				GVL.BufferProducts.Storage3.Component:= 'Blue Cylinder';
+				GVL.BufferProducts.Storage3.Quatity:=4;
+			ELSIF mxROct THEN
+				GVL.BufferProducts.Storage3.Component:= 'Red Octagon';
+				GVL.BufferProducts.Storage3.Quatity:=4;
+			ELSIF mxYOct THEN
+				GVL.BufferProducts.Storage3.Component:= 'Yellow Octagon';
+				GVL.BufferProducts.Storage3.Quatity:=4;
+			ELSIF mxBOct THEN
+				GVL.BufferProducts.Storage3.Component:= 'Blue Octagon';
+				GVL.BufferProducts.Storage3.Quatity:=4;
+			ELSIF mxIP THEN
+				GVL.BufferProducts.Storage3.Component:='InvalidPart';
+				GVL.BufferProducts.Storage3.Quatity:=0;
+			END_IF
+		END_IF
+		
+		IF GVL.BufferProducts.Storage1.Quatity=0 OR GVL.BufferProducts.Storage2.Quatity=0 OR GVL.BufferProducts.Storage3.Quatity=0 THEN
+			MAIN.ixEmptyBuffer:=TRUE;
+		ELSE
+			MAIN.ixEmptyBuffer:=FALSE;
+		END_IF
+		
+		IF ABB_Control_FB.mxBuffer_3_scanned THEN
+			TASK:=5;
+		END_IF
+		
+		IF
+			GVL.ixEmergencyStop THEN 
+						MAIN.qxEmergySTLamp:=TRUE;
+						GVL.mwStationStatus:=1000;
+						TASK:=2001;
+		END_IF
+		
+	5:
+		GVL.mwStationStatus:=0;
+		MAIN.qxABBExecutLamp:=TRUE;
+		ABB_Control_FB.mxScan:=FALSE;
+		ABB_Control_FB.qxScanBuffer_3:=FALSE;
+		TASK:=7;
+		
+	7:
+		MAIN.qxABBExecutLamp:=FALSE;
+		ABB_Control_FB.ixGoTo_AGV:=FALSE;
+		ABB_Control_FB.qxAssemblyDone:=FALSE;
+		GVL.qxPalletPlacedinAGV:=FALSE;
+		ABB_Control_FB.mxConLeave:=FALSE;
+		GVL.mwStationStatus:=100;
+		IF GVL.BufferProducts.Storage1.Quatity>0 AND GVL.BufferProducts.Storage2.Quatity>0 AND GVL.BufferProducts.Storage3.Quatity>0 THEN
+			TASK:=8;
+		ELSE
+			TASK:=0;
+		END_IF
+	
+	8: // Containers Scanning
+		MAIN.qsTask:='Waiting for AGV';
+		MAIN.qsSubTask:='';
+		
+		IF GVL.ixAGVatStation THEN
+			GVL.mwStationStatus:=300;
+			MAIN.qxABBExecutLamp:=TRUE;
+			ABB_Control_FB.ixGoTo_AGV:=TRUE;
+			ABB_Control_FB.mxScan:= TRUE;
+			MAIN.qsTask:='Go to AGV Pos';
+			MAIN.qsSubTask:='Pick Container';
+			
+			IF ABB_Control_FB.ABBPickLeaveContainerAGVPick_1.mxDone THEN
+				MAIN.qsTask:='Go to Scanner';
+				MAIN.qsSubTask:='Scanning Container';
+			END_IF
+			
+			IF mxEnable THEN
+				IF mxRCon THEN
+					MAIN.qsContainer:='Red Container';
+				ELSIF mxYCon THEN
+					MAIN.qsContainer:='Yellow Container';
+				ELSIF mxBCon THEN
+					MAIN.qsContainer:='Blue Container';
+				END_IF
+				TASK:=9;
+			END_IF
+		END_IF
+	
+	9: // Parts Scanning
+		IF ABB_Control_FB.mxContainerScanDone THEN
+			TASK:=44;
+		END_IF
+		
+		IF
+			GVL.ixEmergencyStop THEN 
+						MAIN.qxEmergySTLamp:=TRUE;
+						GVL.mwStationStatus:=1000;
+						TASK:=2001;
+		END_IF
+		
+	44:
+	
+		ABB_Control_FB.ixGoTo_AGV:=FALSE;
+		ABB_Control_FB.qxCon1:=TRUE;
+		MAIN.qsTask:='Scan Products on Container';
+		MAIN.qsSubTask:='Scan Plate';
+		IF ABB_Control_FB.mxCon_1_ATtableScan THEN
+			IF GVL.ixInductiveSensorinTool THEN
+				MAIN.mxPlateAvailable:=TRUE;
+				TASK:=10;
+			ELSIF NOT GVL.ixInductiveSensorinTool THEN
+				TASK:=100;
+			END_IF
+		END_IF
+		
+	10:
+		ABB_Control_FB.mxCon_1_ATtableScan:=FALSE;
+		ABB_Control_FB.qxCon1:=FALSE;
+		TASK:=11;
+		
+	11:
+		ABB_Control_FB.qxCon2:=TRUE;
+		MAIN.qsTask:='Scan Products on Container';
+		MAIN.qsSubTask:='Scan Cylinder';
+		IF ABB_Control_FB.mxCon_2_ATtableScan THEN
+			IF GVL.ixInductiveSensorinTool THEN
+				MAIN.mxCylinderAvailable:=TRUE;
+				TASK:=12;
+			ELSIF NOT GVL.ixInductiveSensorinTool THEN
+				TASK:=101;
+			END_IF
+		END_IF
+		
+	12:
+		ABB_Control_FB.mxCon_2_ATtableScan:=FALSE;
+		ABB_Control_FB.qxCon2:=FALSE;
+		TASK:=13;
+		
+	13:
+		ABB_Control_FB.qxCon3:=TRUE;
+		MAIN.qsTask:='Scan Products on Container';
+		MAIN.qsSubTask:='Scan Octagon';
+		IF ABB_Control_FB.mxCon_3_ATtableScan THEN
+			IF GVL.ixInductiveSensorinTool THEN
+				MAIN.mxOctagonAvailable:=TRUE;
+				TASK:=350;
+			ELSIF NOT GVL.ixInductiveSensorinTool THEN
+				TASK:=102;
+			END_IF
+		END_IF
+		
+	100:
+		GVL.ixAGVatStation:=FALSE;
+		ABB_Control_FB.qxCon1:=FALSE;
+		
+		IF MAIN.qsContainer='Red Container' THEN
+			IF GVL.BufferProducts.Storage1.Component='Red Plate' AND GVL.BufferProducts.Storage1.Quatity>0 THEN
+				MAIN.mwBufferID:=1;
+				ABB_Control_FB.qxPart_1_Assemble:=TRUE;
+				MAIN.qsTask:='Assembly';
+				MAIN.qsSubTask:='Assembling Red Plate';
+				GVL.BufferProducts.Storage1.Quatity:=GVL.BufferProducts.Storage1.Quatity-1;
+				TASK:=200;
+			ELSIF GVL.BufferProducts.Storage2.Component='Red Plate' AND GVL.BufferProducts.Storage2.Quatity>0 THEN
+				MAIN.mwBufferID:=2;
+				ABB_Control_FB.qxPart_2_Assemble:=TRUE;
+				MAIN.qsTask:='Assembly';
+				MAIN.qsSubTask:='Assembling Red Plate';
+				GVL.BufferProducts.Storage2.Quatity:=GVL.BufferProducts.Storage2.Quatity-1;
+				TASK:=200;
+			ELSIF GVL.BufferProducts.Storage3.Component='Red Plate' AND GVL.BufferProducts.Storage3.Quatity>0 THEN
+				MAIN.mwBufferID:=3;
+				ABB_Control_FB.qxPart_3_Assemble:=TRUE;
+				MAIN.qsTask:='Assembly';
+				MAIN.qsSubTask:='Assembling Red Plate';
+				GVL.BufferProducts.Storage3.Quatity:=GVL.BufferProducts.Storage3.Quatity-1;
+				TASK:=200;
+			ELSE
+				TASK:=150;				
+			END_IF
+			
+		ELSIF MAIN.qsContainer='Yellow Container' THEN
+			IF GVL.BufferProducts.Storage1.Component='Yellow Plate' AND GVL.BufferProducts.Storage1.Quatity>0 THEN
+				MAIN.mwBufferID:=1;
+				ABB_Control_FB.qxPart_1_Assemble:=TRUE;
+				MAIN.qsTask:='Assembly';
+				MAIN.qsSubTask:='Assembling Yellow Plate';
+				GVL.BufferProducts.Storage1.Quatity:=GVL.BufferProducts.Storage1.Quatity-1;
+				TASK:=200;
+			ELSIF GVL.BufferProducts.Storage2.Component='Yellow Plate' AND GVL.BufferProducts.Storage2.Quatity>0 THEN
+				MAIN.mwBufferID:=2;
+				ABB_Control_FB.qxPart_2_Assemble:=TRUE;
+				MAIN.qsTask:='Assembly';
+				MAIN.qsSubTask:='Assembling Yellow Plate';
+				GVL.BufferProducts.Storage2.Quatity:=GVL.BufferProducts.Storage2.Quatity-1;
+				TASK:=200;
+			ELSIF GVL.BufferProducts.Storage3.Component='Yellow Plate' AND GVL.BufferProducts.Storage3.Quatity>0 THEN
+				MAIN.mwBufferID:=3;
+				ABB_Control_FB.qxPart_3_Assemble:=TRUE;
+				MAIN.qsTask:='Assembly';
+				MAIN.qsSubTask:='Assembling Yellow Plate';
+				GVL.BufferProducts.Storage3.Quatity:=GVL.BufferProducts.Storage3.Quatity-1;
+				TASK:=200;
+			ELSE
+				TASK:=150;
+			END_IF
+			
+		ELSIF MAIN.qsContainer='Blue Container' THEN
+			IF GVL.BufferProducts.Storage1.Component='Blue Plate' AND GVL.BufferProducts.Storage1.Quatity>0 THEN
+				MAIN.mwBufferID:=1;
+				ABB_Control_FB.qxPart_1_Assemble:=TRUE;
+				MAIN.qsTask:='Assembly';
+				MAIN.qsSubTask:='Assembling Blue Plate';
+				GVL.BufferProducts.Storage1.Quatity:=GVL.BufferProducts.Storage1.Quatity-1;
+				TASK:=200;
+			ELSIF GVL.BufferProducts.Storage2.Component='Blue Plate' AND GVL.BufferProducts.Storage2.Quatity>0 THEN
+				MAIN.mwBufferID:=2;
+				ABB_Control_FB.qxPart_2_Assemble:=TRUE;
+				MAIN.qsTask:='Assembly';
+				MAIN.qsSubTask:='Assembling Blue Plate';
+				GVL.BufferProducts.Storage2.Quatity:=GVL.BufferProducts.Storage2.Quatity-1;
+				TASK:=200;
+			ELSIF GVL.BufferProducts.Storage3.Component='Blue Plate' AND GVL.BufferProducts.Storage3.Quatity>0 THEN
+				MAIN.mwBufferID:=3;
+				ABB_Control_FB.qxPart_3_Assemble:=TRUE;
+				MAIN.qsTask:='Assembly';
+				MAIN.qsSubTask:='Assembling Blue Plate';
+				GVL.BufferProducts.Storage3.Quatity:=GVL.BufferProducts.Storage3.Quatity-1;
+				TASK:=200;
+			ELSE
+				TASK:=150;
+			END_IF		
+		END_IF
+		
+		IF
+			GVL.ixEmergencyStop THEN 
+						MAIN.qxEmergySTLamp:=TRUE;
+						GVL.mwStationStatus:=1000;
+						TASK:=2001;
+		END_IF
+	
+	200:
+		IF ABB_Control_FB.mxAsse_1_done THEN
+			MAIN.qsTask:='Assembly';
+			MAIN.qsSubTask:='Plate Assembled';
+			MAIN.mxPlateAvailable:=TRUE;
+			mxPlate:=TRUE;
+			ABB_Control_FB.qxPart_1_Assemble:=FALSE;
+			TASK:=10;
+		ELSIF ABB_Control_FB.mxAsse_2_done THEN
+			MAIN.qsTask:='Assembly';
+			MAIN.qsSubTask:='Plate Assembled';
+			MAIN.mxPlateAvailable:=TRUE;
+			mxPlate:=TRUE;
+			ABB_Control_FB.qxPart_2_Assemble:=FALSE;
+			TASK:=10;
+		ELSIF ABB_Control_FB.mxAsse_3_done THEN
+			MAIN.qsTask:='Assembly';
+			MAIN.qsSubTask:='Plate Assembled';
+			MAIN.mxPlateAvailable:=TRUE;
+			mxPlate:=TRUE;
+			ABB_Control_FB.qxPart_3_Assemble:=FALSE;
+			TASK:=10;
+		END_IF
+		
+	101:
+		IF MAIN.qsContainer='Red Container' THEN
+			IF GVL.BufferProducts.Storage1.Component='Red Cylinder' AND GVL.BufferProducts.Storage1.Quatity>0 THEN
+				MAIN.mwBufferID:=1;
+				ABB_Control_FB.qxPart_1_Assemble:=TRUE;
+				MAIN.qsTask:='Assembly';
+				MAIN.qsSubTask:='Assembling Red Cylinder';
+				GVL.BufferProducts.Storage1.Quatity:=GVL.BufferProducts.Storage1.Quatity-1;
+				TASK:=201;
+			ELSIF GVL.BufferProducts.Storage2.Component='Red Cylinder' AND GVL.BufferProducts.Storage2.Quatity>0 THEN
+				MAIN.mwBufferID:=2;
+				ABB_Control_FB.qxPart_2_Assemble:=TRUE;
+				MAIN.qsTask:='Assembly';
+				MAIN.qsSubTask:='Assembling Red Cylinder';
+				GVL.BufferProducts.Storage2.Quatity:=GVL.BufferProducts.Storage2.Quatity-1;
+				TASK:=201;
+			ELSIF GVL.BufferProducts.Storage3.Component='Red Cylinder' AND GVL.BufferProducts.Storage3.Quatity>0 THEN
+				MAIN.mwBufferID:=3;
+				ABB_Control_FB.qxPart_3_Assemble:=TRUE;
+				MAIN.qsTask:='Assembly';
+				MAIN.qsSubTask:='Assembling Red Cylinder';
+				GVL.BufferProducts.Storage3.Quatity:=GVL.BufferProducts.Storage3.Quatity-1;
+				TASK:=201;
+			ELSE
+				TASK:=12;				
+			END_IF
+			
+		ELSIF MAIN.qsContainer='Yellow Container' THEN
+			IF GVL.BufferProducts.Storage1.Component='Yellow Cylinder' AND GVL.BufferProducts.Storage1.Quatity>0 THEN
+				MAIN.mwBufferID:=1;
+				ABB_Control_FB.qxPart_1_Assemble:=TRUE;
+				MAIN.qsTask:='Assembly';
+				MAIN.qsSubTask:='Assembling Yellow Cylinder';
+				GVL.BufferProducts.Storage1.Quatity:=GVL.BufferProducts.Storage1.Quatity-1;
+				TASK:=201;
+			ELSIF GVL.BufferProducts.Storage2.Component='Yellow Cylinder' AND GVL.BufferProducts.Storage2.Quatity>0 THEN
+				MAIN.mwBufferID:=2;
+				ABB_Control_FB.qxPart_2_Assemble:=TRUE;
+				MAIN.qsTask:='Assembly';
+				MAIN.qsSubTask:='Assembling Yellow Cylinder';
+				GVL.BufferProducts.Storage2.Quatity:=GVL.BufferProducts.Storage2.Quatity-1;
+				TASK:=201;
+			ELSIF GVL.BufferProducts.Storage3.Component='Yellow Cylinder' AND GVL.BufferProducts.Storage3.Quatity>0 THEN
+				MAIN.mwBufferID:=3;
+				ABB_Control_FB.qxPart_3_Assemble:=TRUE;
+				MAIN.qsTask:='Assembly';
+				MAIN.qsSubTask:='Assembling Yellow Cylinder';
+				GVL.BufferProducts.Storage3.Quatity:=GVL.BufferProducts.Storage3.Quatity-1;
+				TASK:=201;
+			ELSE
+				TASK:=12;
+			END_IF
+			
+		ELSIF MAIN.qsContainer='Blue Container' THEN
+			IF GVL.BufferProducts.Storage1.Component='Blue Cylinder' AND GVL.BufferProducts.Storage1.Quatity>0 THEN
+				MAIN.mwBufferID:=1;
+				ABB_Control_FB.qxPart_1_Assemble:=TRUE;
+				MAIN.qsTask:='Assembly';
+				MAIN.qsSubTask:='Assembling Blue Cylinder';
+				GVL.BufferProducts.Storage1.Quatity:=GVL.BufferProducts.Storage1.Quatity-1;
+				TASK:=201;
+			ELSIF GVL.BufferProducts.Storage2.Component='Blue Cylinder' AND GVL.BufferProducts.Storage2.Quatity>0 THEN
+				MAIN.mwBufferID:=2;
+				ABB_Control_FB.qxPart_2_Assemble:=TRUE;
+				MAIN.qsTask:='Assembly';
+				MAIN.qsSubTask:='Assembling Blue Cylinder';
+				GVL.BufferProducts.Storage2.Quatity:=GVL.BufferProducts.Storage2.Quatity-1;
+				TASK:=201;
+			ELSIF GVL.BufferProducts.Storage3.Component='Blue Cylinder' AND GVL.BufferProducts.Storage3.Quatity>0 THEN
+				MAIN.mwBufferID:=3;
+				ABB_Control_FB.qxPart_3_Assemble:=TRUE;
+				MAIN.qsTask:='Assembly';
+				MAIN.qsSubTask:='Assembling Blue Cylinder';
+				GVL.BufferProducts.Storage3.Quatity:=GVL.BufferProducts.Storage3.Quatity-1;
+				TASK:=201;
+			ELSE
+				TASK:=12;
+			END_IF		
+		END_IF
+		
+		IF
+			GVL.ixEmergencyStop THEN 
+						MAIN.qxEmergySTLamp:=TRUE;
+						GVL.mwStationStatus:=1000;
+						TASK:=2001;
+		END_IF
+		
+	102:
+		ABB_Control_FB.qxCon3:=FALSE;
+		IF MAIN.qsContainer='Red Container' THEN
+			IF GVL.BufferProducts.Storage1.Component='Red Octagon' AND GVL.BufferProducts.Storage1.Quatity>0 THEN
+				MAIN.mwBufferID:=1;
+				ABB_Control_FB.qxPart_1_Assemble:=TRUE;
+				MAIN.qsTask:='Assembly';
+				MAIN.qsSubTask:='Assembling Red Octagon';
+				GVL.BufferProducts.Storage1.Quatity:=GVL.BufferProducts.Storage1.Quatity-1;
+				TASK:=600;
+			ELSIF GVL.BufferProducts.Storage2.Component='Red Octagon' AND GVL.BufferProducts.Storage2.Quatity>0 THEN
+				MAIN.mwBufferID:=2;
+				ABB_Control_FB.qxPart_2_Assemble:=TRUE;
+				MAIN.qsTask:='Assembly';
+				MAIN.qsSubTask:='Assembling Red Octagon';
+				GVL.BufferProducts.Storage2.Quatity:=GVL.BufferProducts.Storage2.Quatity-1;
+				TASK:=600;
+			ELSIF GVL.BufferProducts.Storage3.Component='Red Octagon' AND GVL.BufferProducts.Storage3.Quatity>0 THEN
+				MAIN.mwBufferID:=3;
+				ABB_Control_FB.qxPart_3_Assemble:=TRUE;
+				MAIN.qsTask:='Assembly';
+				MAIN.qsSubTask:='Assembling Red Octagon';
+				GVL.BufferProducts.Storage3.Quatity:=GVL.BufferProducts.Storage3.Quatity-1;
+				TASK:=600;
+			ELSE
+				TASK:=350;				
+			END_IF
+			
+		ELSIF MAIN.qsContainer='Yellow Container' THEN
+			IF GVL.BufferProducts.Storage1.Component='Yellow Octagon' AND GVL.BufferProducts.Storage1.Quatity>0 THEN
+				MAIN.mwBufferID:=1;
+				ABB_Control_FB.qxPart_1_Assemble:=TRUE;
+				MAIN.qsTask:='Assembly';
+				MAIN.qsSubTask:='Assembling Yellow Octagon';
+				GVL.BufferProducts.Storage1.Quatity:=GVL.BufferProducts.Storage1.Quatity-1;
+				TASK:=600;
+			ELSIF GVL.BufferProducts.Storage2.Component='Yellow Octagon' AND GVL.BufferProducts.Storage2.Quatity>0 THEN
+				MAIN.mwBufferID:=2;
+				ABB_Control_FB.qxPart_2_Assemble:=TRUE;
+				MAIN.qsTask:='Assembly';
+				MAIN.qsSubTask:='Assembling Yellow Octagon';
+				GVL.BufferProducts.Storage2.Quatity:=GVL.BufferProducts.Storage2.Quatity-1;
+				TASK:=600;
+			ELSIF GVL.BufferProducts.Storage3.Component='Yellow Octagon' AND GVL.BufferProducts.Storage3.Quatity>0 THEN
+				MAIN.mwBufferID:=3;
+				ABB_Control_FB.qxPart_3_Assemble:=TRUE;
+				MAIN.qsTask:='Assembly';
+				MAIN.qsSubTask:='Assembling Yellow Octagon';
+				GVL.BufferProducts.Storage3.Quatity:=GVL.BufferProducts.Storage3.Quatity-1;
+				TASK:=600;
+			ELSE
+				TASK:=350;
+			END_IF
+			
+		ELSIF MAIN.qsContainer='Blue Container' THEN
+			IF GVL.BufferProducts.Storage1.Component='Blue Octagon' AND GVL.BufferProducts.Storage1.Quatity>0 THEN
+				MAIN.mwBufferID:=1;
+				ABB_Control_FB.qxPart_1_Assemble:=TRUE;
+				MAIN.qsTask:='Assembly';
+				MAIN.qsSubTask:='Assembling Blue Octagon';
+				GVL.BufferProducts.Storage1.Quatity:=GVL.BufferProducts.Storage1.Quatity-1;
+				TASK:=600;
+			ELSIF GVL.BufferProducts.Storage2.Component='Blue Octagon' AND GVL.BufferProducts.Storage2.Quatity>0 THEN
+				MAIN.mwBufferID:=2;
+				ABB_Control_FB.qxPart_2_Assemble:=TRUE;
+				MAIN.qsTask:='Assembly';
+				MAIN.qsSubTask:='Assembling Blue Octagon';
+				GVL.BufferProducts.Storage2.Quatity:=GVL.BufferProducts.Storage2.Quatity-1;
+				TASK:=600;
+			ELSIF GVL.BufferProducts.Storage3.Component='Blue Octagon' AND GVL.BufferProducts.Storage3.Quatity>0 THEN
+				MAIN.mwBufferID:=3;
+				ABB_Control_FB.qxPart_3_Assemble:=TRUE;
+				MAIN.qsTask:='Assembly';
+				MAIN.qsSubTask:='Assembling Blue Octagon';
+				GVL.BufferProducts.Storage3.Quatity:=GVL.BufferProducts.Storage3.Quatity-1;
+				TASK:=600;
+			ELSE
+				TASK:=350;
+			END_IF		
+		END_IF
+		
+		IF
+			GVL.ixEmergencyStop THEN 
+						MAIN.qxEmergySTLamp:=TRUE;
+						GVL.mwStationStatus:=1000;
+						TASK:=2001;
+		END_IF
+		
+	201: 
+		IF ABB_Control_FB.mxAsse_1_done THEN
+			MAIN.qsTask:='Assembly';
+			MAIN.qsSubTask:='Cylinder Assembled';
+			MAIN.mxCylinderAvailable:=TRUE;
+			ABB_Control_FB.qxPart_1_Assemble:=FALSE;
+			TASK:=12;
+		ELSIF ABB_Control_FB.mxAsse_2_done THEN
+			MAIN.qsTask:='Assembly';
+			MAIN.qsSubTask:='Cylinder Assembled';
+			MAIN.mxCylinderAvailable:=TRUE;
+			ABB_Control_FB.qxPart_2_Assemble:=FALSE;
+			TASK:=12;
+		ELSIF ABB_Control_FB.mxAsse_3_done THEN
+			MAIN.qsTask:='Assembly';
+			MAIN.qsSubTask:='Cylinder Assembled';
+			MAIN.mxCylinderAvailable:=TRUE;
+			ABB_Control_FB.qxPart_3_Assemble:=FALSE;
+			TASK:=12;
+		END_IF
+	
+	600:
+		IF ABB_Control_FB.mxAsse_1_done THEN
+			MAIN.qsTask:='Assembly';
+			MAIN.qsSubTask:='Octagon Assembled';
+			MAIN.mxOctagonAvailable:=TRUE;
+			mxOctagon:=TRUE;
+			ABB_Control_FB.qxPart_1_Assemble:=FALSE;
+			TASK:=700;
+		ELSIF ABB_Control_FB.mxAsse_2_done THEN
+			MAIN.qsTask:='Assembly';
+			MAIN.qsSubTask:='Octagon Assembled';
+			MAIN.mxOctagonAvailable:=TRUE;
+			mxOctagon:=TRUE;
+			ABB_Control_FB.qxPart_2_Assemble:=FALSE;
+			TASK:=700;
+		ELSIF ABB_Control_FB.mxAsse_3_done THEN
+			MAIN.qsTask:='Assembly';
+			MAIN.qsSubTask:='Octagon Assembled';
+			MAIN.mxOctagonAvailable:=TRUE;
+			mxOctagon:=TRUE;
+			ABB_Control_FB.qxPart_3_Assemble:=FALSE;
+			TASK:=700;
+		END_IF
+		
+	700:
+		IF MAIN.mxPlateAvailable AND MAIN.mxCylinderAvailable AND MAIN.mxOctagonAvailable THEN
+			ABB_Control_FB.qxAssemblyDone:=TRUE;
+			GVL.qsOrderFornextAssembly:='Assembled Product';
+			IF ABB_Control_FB.mxConLeave THEN
+				MAIN.mxPlateAvailable:=FALSE;
+				MAIN.mxCylinderAvailable:=FALSE;
+				MAIN.mxOctagonAvailable:=FALSE;
+				GVL.qxPalletPlacedinAGV:=TRUE;
+				GVL.qsOrderFornextAssembly:='0';
+				TASK:=7;
+			END_IF
+		END_IF
+	
+	150: // Order for Plates
+		IF MAIN.qsContainer='Red Container' THEN
+			GVL.qsOrderFornextAssembly:='Red Plate';
+			TASK:=111;
+		ELSIF MAIN.qsContainer='Yellow Container' THEN
+			GVL.qsOrderFornextAssembly:='Yellow Plate';
+			TASK:=111;
+		ELSIF MAIN.qsContainer='Blue Container' THEN
+			GVL.qsOrderFornextAssembly:='Blue Plate';
+			TASK:=111;
+		END_IF
+		
+	350: // Order for missing Parts
+		ABB_Control_FB.qxCon3:=FALSE;
+		ABB_Control_FB.qxPart_3_Assemble:=FALSE;
+		
+		IF mxCylinder OR MAIN.mxCylinderAvailable THEN
+			mxPART2:=TRUE;
+			TASK:=351;
+		ELSE
+			mxPART2:=FALSE;
+			TASK:=351;
+		END_IF
+		
+	351:
+		IF mxOctagon OR MAIN.mxOctagonAvailable THEN
+			mxPART3:=TRUE;
+			TASK:=352;
+		ELSE
+			mxPART3:=FALSE;
+			TASK:=352;
+		END_IF
+		
+	352:
+		IF MAIN.qsContainer='Red Container' THEN
+			IF mxPART2 AND mxPART3 THEN
+				GVL.qsOrderFornextAssembly:='Assembled Product';
+				TASK:=111;
+			ELSIF mxPART2 AND NOT mxPART3 THEN
+				GVL.qsOrderFornextAssembly:='Red Octagon';
+				TASK:=111;
+			ELSIF NOT mxPART2 AND mxPART3 THEN
+				GVL.qsOrderFornextAssembly:='Red Cylinder';
+				TASK:=111;
+			ELSIF NOT mxPART2 AND NOT mxPART3 THEN
+				GVL.qsOrderFornextAssembly:='Red Cylinder';
+				TASK:=111;
+			END_IF
+			
+		ELSIF MAIN.qsContainer='Yellow Container' THEN
+			IF mxPART2 AND mxPART3 THEN
+				GVL.qsOrderFornextAssembly:='Assembled Product';
+				TASK:=111;
+			ELSIF mxPART2 AND NOT mxPART3 THEN
+				GVL.qsOrderFornextAssembly:='Yellow Octagon';
+				TASK:=111;
+			ELSIF NOT mxPART2 AND mxPART3 THEN
+				GVL.qsOrderFornextAssembly:='Yellow Cylinder';
+				TASK:=111;
+			ELSIF NOT mxPART2 AND NOT mxPART3 THEN
+				GVL.qsOrderFornextAssembly:='Yellow Cylinder';
+				TASK:=111;
+			END_IF
+			
+		ELSIF MAIN.qsContainer='Blue Container' THEN
+			IF mxPART2 AND mxPART3 THEN
+				GVL.qsOrderFornextAssembly:='Assembled Product';
+				TASK:=111;
+			ELSIF mxPART2 AND NOT mxPART3 THEN
+				GVL.qsOrderFornextAssembly:='Blue Octagon';
+				TASK:=111;
+			ELSIF NOT mxPART2 AND mxPART3 THEN
+				GVL.qsOrderFornextAssembly:='Blue Cylinder';
+				TASK:=111;
+			ELSIF NOT mxPART2 AND NOT mxPART3 THEN
+				GVL.qsOrderFornextAssembly:='Blue Cylinder';
+				TASK:=111;
+			END_IF
+		END_IF
+		
+		
+	111:
+		ABB_Control_FB.qxPart_1_Assemble:=FALSE;
+		ABB_Control_FB.qxPart_2_Assemble:=FALSE;
+		ABB_Control_FB.qxPart_3_Assemble:=FALSE;
+		ABB_Control_FB.qxCon1:=FALSE;
+		ABB_Control_FB.qxCon2:=FALSE;
+		ABB_Control_FB.qxCon3:=FALSE;
+		ABB_Control_FB.ixGoTo_AGV:=FALSE;
+		ABB_Control_FB.qxScanBuffer_1:=FALSE;
+		ABB_Control_FB.qxScanBuffer_2:=FALSE;
+		ABB_Control_FB.qxScanBuffer_3:=FALSE;
+		mxPART2:=FALSE;
+		mxPART3:=FALSE;
+		ABB_Control_FB.qxAssemblyDone:=TRUE;
+		GVL.qsOrderFornextAssembly:='Assembled Product';
+		IF ABB_Control_FB.ABBGotoAGVPos_Assembled.mxEnable THEN
+			MAIN.qsTask:='Go to AGV Pos';
+			MAIN.qsSubTask:='Leave Container';
+			TASK:=121;
+		END_IF
+		
+	121:
+		IF ABB_Control_FB.mxConLeave THEN
+			mxPlate:=FALSE;
+			mxCylinder:=FALSE;
+			mxOctagon:=FALSE;
+			MAIN.mxPlateAvailable:=FALSE;
+			MAIN.mxCylinderAvailable:=FALSE;
+			MAIN.mxOctagonAvailable:=FALSE;
+			GVL.qxPalletPlacedinAGV:=TRUE;
+			GVL.qsOrderFornextAssembly:='0';
+			MAIN.qsContainer:='';
+			TASK:=7;
+		END_IF
+		
+		
+	// MANUAL MODE
+	
+	1000:
+		GVL.mwStationStatus:=400;
+		IF ABB_Control_FB.ixGotoHome THEN
+			ABB_Control_FB.qxGotoHome:=TRUE;
+			MAIN.qxABBExecutLamp:=TRUE;
+			TASK:=1100;
+		ELSIF ABB_Control_FB.ixGotoAGV THEN
+			ABB_Control_FB.qxGotoAGV:=TRUE;
+			MAIN.qxABBExecutLamp:=TRUE;
+			TASK:=1200;
+		ELSIF ABB_Control_FB.ixGotoTable THEN
+			ABB_Control_FB.qxGotoTable:=TRUE;
+			MAIN.qxABBExecutLamp:=TRUE;
+			TASK:=1300;
+		ELSIF ABB_Control_FB.ixGotoBuffer THEN
+			ABB_Control_FB.qxGotoBuffer:=TRUE;
+			MAIN.qxABBExecutLamp:=TRUE;
+			TASK:=1400;
+		ELSIF ABB_Control_FB.ixGotoScanner THEN
+			ABB_Control_FB.qxGotoScanner:=TRUE;
+			MAIN.qxABBExecutLamp:=TRUE;
+			TASK:=1500;
+		ELSIF ABB_Control_FB.ixPickBuffer1 THEN
+			ABB_Control_FB.qxPickBuffer1:=TRUE;
+			MAIN.qxABBExecutLamp:=TRUE;
+			TASK:=1600;
+		ELSIF ABB_Control_FB.ixLeaveBuffer1 THEN
+			ABB_Control_FB.qxLeaveBuffer1:=TRUE;
+			MAIN.qxABBExecutLamp:=TRUE;
+			TASK:=1700;
+		ELSIF ABB_Control_FB.ixPickBuffer2 THEN
+			ABB_Control_FB.qxPickBuffer2:=TRUE;
+			MAIN.qxABBExecutLamp:=TRUE;
+			TASK:=1600;
+		ELSIF ABB_Control_FB.ixLeaveBuffer2 THEN
+			ABB_Control_FB.qxLeaveBuffer2:=TRUE;
+			MAIN.qxABBExecutLamp:=TRUE;
+			TASK:=1700;
+		ELSIF ABB_Control_FB.ixPickBuffer3 THEN
+			ABB_Control_FB.qxPickBuffer3:=TRUE;
+			MAIN.qxABBExecutLamp:=TRUE;
+			TASK:=1600;
+		ELSIF ABB_Control_FB.ixLeaveBuffer3 THEN
+			ABB_Control_FB.qxLeaveBuffer3:=TRUE;
+			MAIN.qxABBExecutLamp:=TRUE;
+			TASK:=1700;
+		ELSIF ABB_Control_FB.ixPickScanner THEN
+			ABB_Control_FB.qxPickScanner:=TRUE;
+			MAIN.qxABBExecutLamp:=TRUE;
+			TASK:=1800;
+		ELSIF ABB_Control_FB.ixLeaveScanner THEN
+			ABB_Control_FB.qxLeaveScanner:=TRUE;
+			MAIN.qxABBExecutLamp:=TRUE;
+			TASK:=1900;
+		ELSIF ABB_Control_FB.ixPickAGV THEN
+			ABB_Control_FB.qxPickAGV:=TRUE;
+			MAIN.qxABBExecutLamp:=TRUE;
+			TASK:=2000;
+		ELSIF ABB_Control_FB.ixLeaveAGV THEN
+			ABB_Control_FB.qxLeaveAGV:=TRUE;
+			MAIN.qxABBExecutLamp:=TRUE;
+			TASK:=2100;
+		ELSIF ABB_Control_FB.ixPickTable THEN
+			ABB_Control_FB.qxPickTable:=TRUE;
+			MAIN.qxABBExecutLamp:=TRUE;
+			TASK:=2500;
+		ELSIF ABB_Control_FB.ixLeaveTable THEN
+			ABB_Control_FB.qxLeaveTable:=TRUE;
+			MAIN.qxABBExecutLamp:=TRUE;
+			TASK:=2600;
+		ELSIF ABB_Control_FB.ixScanBuffer THEN
+			ABB_Control_FB.mxScan:=TRUE;
+			IF MAIN.mwBufferID=1 THEN
+				TASK:=2200;
+			ELSIF MAIN.mwBufferID=2 THEN
+				TASK:=2300;
+			ELSIF MAIN.mwBufferID=3 THEN
+				TASK:=2400;
+			END_IF
+		ELSIF ABB_Control_FB.ixScanContainer THEN
+			ABB_Control_FB.mxScan:=TRUE;
+			TASK:=2700;
+		ELSIF ABB_Control_FB.ixScanPart1 THEN
+			MAIN.qxABBExecutLamp:=TRUE;
+			TASK:=2800;
+		ELSIF ABB_Control_FB.ixScanPart2 THEN
+			MAIN.qxABBExecutLamp:=TRUE;
+			TASK:=2900;
+		ELSIF ABB_Control_FB.ixScanPart3 THEN
+			MAIN.qxABBExecutLamp:=TRUE;
+			TASK:=3000;
+		ELSIF ABB_Control_FB.ixAssemble1 THEN
+			MAIN.qxABBExecutLamp:=TRUE;
+			GVL.BufferProducts.Storage1.Quatity:=GVL.BufferProducts.Storage1.Quatity-1;
+			TASK:=3100;
+		ELSIF ABB_Control_FB.ixAssemble2 THEN
+			MAIN.qxABBExecutLamp:=TRUE;
+			GVL.BufferProducts.Storage2.Quatity:=GVL.BufferProducts.Storage2.Quatity-1;
+			TASK:=3200;
+		ELSIF ABB_Control_FB.ixAssemble3 THEN
+			MAIN.qxABBExecutLamp:=TRUE;
+			GVL.BufferProducts.Storage3.Quatity:=GVL.BufferProducts.Storage3.Quatity-1;
+			TASK:=3300;
+		ELSIF ABB_Control_FB.ixSendOrder THEN
+			TASK:=3400;
+		ELSIF ABB_Control_FB.ixFinishOrder THEN
+			TASK:=3900;
+			
+		END_IF
+		
+	1100:
+		IF ABB_Control_FB.qxHOME THEN
+			MAIN.qxABBExecutLamp:=FALSE;
+			ABB_Control_FB.qxGotoHome:=FALSE;
+			ABB_Control_FB.ixGotoHome:=FALSE;
+			TASK:=1000;
+		END_IF
+		
+	1200:
+		IF ABB_Control_FB.qxAGV THEN
+			MAIN.qxABBExecutLamp:=FALSE;
+			ABB_Control_FB.qxGotoAGV:=FALSE;
+			ABB_Control_FB.ixGotoAGV:=FALSE;
+			TASK:=1000;
+		END_IF
+		
+	1300:
+		IF ABB_Control_FB.qxTABLE THEN
+			MAIN.qxABBExecutLamp:=FALSE;
+			ABB_Control_FB.qxGotoTable:=FALSE;
+			ABB_Control_FB.ixGotoTable:=FALSE;
+			TASK:=1000;
+		END_IF
+		
+	1400:
+		IF ABB_Control_FB.qxBUFFER THEN
+			MAIN.qxABBExecutLamp:=FALSE;
+			ABB_Control_FB.qxGotoBuffer:=FALSE;
+			ABB_Control_FB.ixGotoBuffer:=FALSE;
+			TASK:=1000;
+		END_IF
+		
+	1500:
+		IF ABB_Control_FB.qxSCANNER THEN
+			MAIN.qxABBExecutLamp:=FALSE;
+			ABB_Control_FB.qxGotoScanner:=FALSE;
+			ABB_Control_FB.ixGotoScanner:=FALSE;
+			TASK:=1000;
+		END_IF
+		
+	1600:
+		IF ABB_Control_FB.qxBufferPicked1 THEN
+			MAIN.qxABBExecutLamp:=FALSE;
+			ABB_Control_FB.qxPickBuffer1:=FALSE;
+			ABB_Control_FB.ixPickBuffer1:=FALSE;
+			ABB_Control_FB.qxPickBuffer2:=FALSE;
+			ABB_Control_FB.ixPickBuffer2:=FALSE;
+			ABB_Control_FB.qxPickBuffer3:=FALSE;
+			ABB_Control_FB.ixPickBuffer3:=FALSE;
+			TASK:=1000;
+		END_IF
+		
+	1700:
+		IF ABB_Control_FB.qxBufferLeft1 THEN
+			MAIN.qxABBExecutLamp:=FALSE;
+			ABB_Control_FB.qxPickBuffer1:=FALSE;
+			ABB_Control_FB.ixPickBuffer1:=FALSE;
+			ABB_Control_FB.qxPickBuffer2:=FALSE;
+			ABB_Control_FB.ixPickBuffer2:=FALSE;
+			ABB_Control_FB.qxPickBuffer3:=FALSE;
+			ABB_Control_FB.ixPickBuffer3:=FALSE;
+			TASK:=1000;
+		END_IF
+		
+	1800:
+		IF ABB_Control_FB.qxPickedScanner THEN
+			MAIN.qxABBExecutLamp:=FALSE;
+			ABB_Control_FB.qxPickScanner:=FALSE;
+			ABB_Control_FB.ixPickScanner:=FALSE;
+			TASK:=1000;
+		END_IF
+		
+	1900:
+		IF ABB_Control_FB.qxLeftScanner THEN
+			MAIN.qxABBExecutLamp:=FALSE;
+			ABB_Control_FB.qxLeaveScanner:=FALSE;
+			ABB_Control_FB.ixLeaveScanner:=FALSE;
+			TASK:=1000;
+		END_IF
+		
+	2000:
+		IF ABB_Control_FB.qxPickedAGV THEN
+			MAIN.qxABBExecutLamp:=FALSE;
+			GVL.qxPickedfromAGV:=TRUE;
+			ABB_Control_FB.qxPickAGV:=FALSE;
+			ABB_Control_FB.ixPickAGV:=FALSE;
+			TASK:=1000;
+		END_IF
+		
+	2100:
+		IF ABB_Control_FB.qxLeftAGV THEN
+			MAIN.qxABBExecutLamp:=FALSE;
+			GVL.qxPalletPlacedinAGV:=TRUE;
+			ABB_Control_FB.qxLeaveAGV:=FALSE;
+			ABB_Control_FB.ixLeaveAGV:=FALSE;
+			TASK:=1000;
+		END_IF
+		
+	2200:
+			IF mxRP THEN
+				GVL.BufferProducts.Storage1.Component:= 'Red Plate';
+				GVL.BufferProducts.Storage1.Quatity:=2;
+			ELSIF mxYP THEN
+				GVL.BufferProducts.Storage1.Component:= 'Yellow Plate';
+				GVL.BufferProducts.Storage1.Quatity:=2;
+			ELSIF mxBP THEN
+				GVL.BufferProducts.Storage1.Component:='Blue Plate';
+				GVL.BufferProducts.Storage1.Quatity:=2;
+			ELSIF mxRCy THEN
+				GVL.BufferProducts.Storage1.Component:= 'Red Cylinder';
+				GVL.BufferProducts.Storage1.Quatity:=4;
+			ELSIF mxYCy THEN
+				GVL.BufferProducts.Storage1.Component:= 'Yellow Cylinder';
+				GVL.BufferProducts.Storage1.Quatity:=4;
+			ELSIF mxBCy THEN
+				GVL.BufferProducts.Storage1.Component:= 'Blue Cylinder';
+				GVL.BufferProducts.Storage1.Quatity:=4;
+			ELSIF mxROct THEN
+				GVL.BufferProducts.Storage1.Component:= 'Red Octagon';
+				GVL.BufferProducts.Storage1.Quatity:=4;
+			ELSIF mxYOct THEN
+				GVL.BufferProducts.Storage1.Component:= 'Yellow Octagon';
+				GVL.BufferProducts.Storage1.Quatity:=4;
+			ELSIF mxBOct THEN
+				GVL.BufferProducts.Storage1.Component:= 'Blue Octagon';
+				GVL.BufferProducts.Storage1.Quatity:=4;
+			ELSIF mxIP THEN
+				GVL.BufferProducts.Storage1.Component:='InvalidPart';
+				GVL.BufferProducts.Storage1.Quatity:=0;
+			END_IF
+			TASK:=1000;
+			
+	2300:
+			IF mxRP THEN
+				GVL.BufferProducts.Storage1.Component:= 'Red Plate';
+				GVL.BufferProducts.Storage1.Quatity:=2;
+			ELSIF mxYP THEN
+				GVL.BufferProducts.Storage1.Component:= 'Yellow Plate';
+				GVL.BufferProducts.Storage1.Quatity:=2;
+			ELSIF mxBP THEN
+				GVL.BufferProducts.Storage1.Component:='Blue Plate';
+				GVL.BufferProducts.Storage1.Quatity:=2;
+			ELSIF mxRCy THEN
+				GVL.BufferProducts.Storage1.Component:= 'Red Cylinder';
+				GVL.BufferProducts.Storage1.Quatity:=4;
+			ELSIF mxYCy THEN
+				GVL.BufferProducts.Storage1.Component:= 'Yellow Cylinder';
+				GVL.BufferProducts.Storage1.Quatity:=4;
+			ELSIF mxBCy THEN
+				GVL.BufferProducts.Storage1.Component:= 'Blue Cylinder';
+				GVL.BufferProducts.Storage1.Quatity:=4;
+			ELSIF mxROct THEN
+				GVL.BufferProducts.Storage1.Component:= 'Red Octagon';
+				GVL.BufferProducts.Storage1.Quatity:=4;
+			ELSIF mxYOct THEN
+				GVL.BufferProducts.Storage1.Component:= 'Yellow Octagon';
+				GVL.BufferProducts.Storage1.Quatity:=4;
+			ELSIF mxBOct THEN
+				GVL.BufferProducts.Storage1.Component:= 'Blue Octagon';
+				GVL.BufferProducts.Storage1.Quatity:=4;
+			ELSIF mxIP THEN
+				GVL.BufferProducts.Storage1.Component:='InvalidPart';
+				GVL.BufferProducts.Storage1.Quatity:=0;
+			END_IF
+			TASK:=1000;
+			
+	2400:
+			IF mxRP THEN
+				GVL.BufferProducts.Storage1.Component:= 'Red Plate';
+				GVL.BufferProducts.Storage1.Quatity:=2;
+			ELSIF mxYP THEN
+				GVL.BufferProducts.Storage1.Component:= 'Yellow Plate';
+				GVL.BufferProducts.Storage1.Quatity:=2;
+			ELSIF mxBP THEN
+				GVL.BufferProducts.Storage1.Component:='Blue Plate';
+				GVL.BufferProducts.Storage1.Quatity:=2;
+			ELSIF mxRCy THEN
+				GVL.BufferProducts.Storage1.Component:= 'Red Cylinder';
+				GVL.BufferProducts.Storage1.Quatity:=4;
+			ELSIF mxYCy THEN
+				GVL.BufferProducts.Storage1.Component:= 'Yellow Cylinder';
+				GVL.BufferProducts.Storage1.Quatity:=4;
+			ELSIF mxBCy THEN
+				GVL.BufferProducts.Storage1.Component:= 'Blue Cylinder';
+				GVL.BufferProducts.Storage1.Quatity:=4;
+			ELSIF mxROct THEN
+				GVL.BufferProducts.Storage1.Component:= 'Red Octagon';
+				GVL.BufferProducts.Storage1.Quatity:=4;
+			ELSIF mxYOct THEN
+				GVL.BufferProducts.Storage1.Component:= 'Yellow Octagon';
+				GVL.BufferProducts.Storage1.Quatity:=4;
+			ELSIF mxBOct THEN
+				GVL.BufferProducts.Storage1.Component:= 'Blue Octagon';
+				GVL.BufferProducts.Storage1.Quatity:=4;
+			ELSIF mxIP THEN
+				GVL.BufferProducts.Storage1.Component:='InvalidPart';
+				GVL.BufferProducts.Storage1.Quatity:=0;
+			END_IF
+			TASK:=1000;
+			
+	2500:
+		IF ABB_Control_FB.qxPickedTable THEN
+			MAIN.qxABBExecutLamp:=FALSE;
+			ABB_Control_FB.qxPickTable:=FALSE;
+			ABB_Control_FB.ixPickTable:=FALSE;
+			TASK:=1000;
+		END_IF
+		
+	2600:
+		IF ABB_Control_FB.qxLeftTable THEN
+			MAIN.qxABBExecutLamp:=FALSE;
+			ABB_Control_FB.qxLeaveTable:=FALSE;
+			ABB_Control_FB.ixLeaveTable:=FALSE;
+			TASK:=1000;
+		END_IF
+		
+	2700:
+				IF mxRCon THEN
+					MAIN.qsContainer:='Red Container';
+				ELSIF mxYCon THEN
+					MAIN.qsContainer:='Yellow Container';
+				ELSIF mxBCon THEN
+					MAIN.qsContainer:='Blue Container';
+				END_IF
+				TASK:=1000;
+				
+	2800:
+		IF ABB_Control_FB.mxCon_1_ATtableScan THEN
+			IF GVL.ixInductiveSensorinTool THEN
+				MAIN.mxPlateAvailable:=TRUE;
+				TASK:=1000;
+				ABB_Control_FB.ixScanPart1:=FALSE;
+				MAIN.qxABBExecutLamp:=FALSE;
+			ELSIF NOT GVL.ixInductiveSensorinTool THEN
+				ABB_Control_FB.ixScanPart1:=FALSE;
+				MAIN.qxABBExecutLamp:=FALSE;
+				TASK:=1000;
+			END_IF
+		END_IF
+		
+	2900:
+		IF ABB_Control_FB.mxCon_2_ATtableScan THEN
+			IF GVL.ixInductiveSensorinTool THEN
+				MAIN.mxCylinderAvailable:=TRUE;
+				TASK:=1000;
+				ABB_Control_FB.ixScanPart2:=FALSE;
+				MAIN.qxABBExecutLamp:=FALSE;
+			ELSIF NOT GVL.ixInductiveSensorinTool THEN
+				ABB_Control_FB.ixScanPart2:=FALSE;
+				MAIN.qxABBExecutLamp:=FALSE;
+				TASK:=1000;
+			END_IF
+		END_IF
+		
+	3000:
+		IF ABB_Control_FB.mxCon_2_ATtableScan THEN
+			IF GVL.ixInductiveSensorinTool THEN
+				MAIN.mxOctagonAvailable:=TRUE;
+				TASK:=1000;
+				ABB_Control_FB.ixScanPart3:=FALSE;
+				MAIN.qxABBExecutLamp:=FALSE;
+			ELSIF NOT GVL.ixInductiveSensorinTool THEN
+				ABB_Control_FB.ixScanPart3:=FALSE;
+				MAIN.qxABBExecutLamp:=FALSE;
+				TASK:=1000;
+			END_IF
+		END_IF
+		
+	3100:
+		IF ABB_Control_FB.mxAsse_1_done THEN
+			mxPart1:=TRUE;
+			ABB_Control_FB.ixAssemble1:=FALSE;
+			MAIN.qxABBExecutLamp:=FALSE;
+			TASK:=1000;
+		END_IF
+		
+	3200:
+		IF ABB_Control_FB.mxAsse_2_done THEN
+			mxPart2:=TRUE;
+			ABB_Control_FB.ixAssemble2:=FALSE;
+			MAIN.qxABBExecutLamp:=FALSE;
+			TASK:=1000;
+		END_IF
+		
+	3300:
+		IF ABB_Control_FB.mxAsse_3_done THEN
+			mxPart3:=TRUE;
+			ABB_Control_FB.ixAssemble3:=FALSE;
+			MAIN.qxABBExecutLamp:=FALSE;
+			TASK:=1000;
+		END_IF
+		
+	3400:
+		IF NOT MAIN.mxPlateAvailable AND mxPart1 THEN
+			IF MAIN.qsContainer='Red Container' THEN
+				GVL.qsOrderFornextAssembly:='Red Plate';
+			ELSIF MAIN.qsContainer='Yellow Container' THEN
+				GVL.qsOrderFornextAssembly:='Yellow Plate';
+			ELSIF MAIN.qsContainer='Blue Container' THEN
+				GVL.qsOrderFornextAssembly:='Blue Plate';
+			ELSE
+				TASK:=3500;
+			END_IF
+		END_IF
+		
+	3500:
+		IF mxPart2 OR MAIN.mxCylinderAvailable THEN
+			mxSLOT1:=TRUE;
+			TASK:=3600;
+		ELSE
+			mxSLOT1:=FALSE;
+			TASK:=3600;
+		END_IF
+		
+	3600:
+	 	IF mxPART3 OR MAIN.mxOctagonAvailable THEN
+		 	mxSLOT2:=TRUE;
+		 	TASK:=3800;
+		ELSE
+			mxSLOT2:=FALSE;
+			TASK:=3800;
+	 	END_IF
+	 
+	3800:
+		IF MAIN.qsContainer='Yellow Container' THEN
+			IF mxSLOT1 AND mxSLOT2 THEN 
+					   gvl.qsOrderFornextAssembly:='Assembled Product';
+					   TASK:=3900;
+					   ELSIF mxSLOT1 AND NOT mxSLOT2 THEN 
+						   gvl.qsOrderFornextAssembly:='Yellow Octagon';
+					    TASK:=3900;
+					   ELSIF NOT mxSLOT1 AND mxSLOT2 THEN 
+						   gvl.qsOrderFornextAssembly:='Yellow Cylinder';
+					    TASk:=3900;
+					   ELSIF NOT mxSLOT1 AND NOT mxSLOT2 THEN
+						  gvl.qsOrderFornextAssembly:='Yellow Cylinder';
+					    TASK:=3900; 
+				   END_IF
+				   
+		ELSIF MAIN.qsContainer='Red Container' THEN
+			IF mxSLOT1 AND mxSLOT2 THEN 
+					   gvl.qsOrderFornextAssembly:='Assembled Product';
+					   TASK:=3900;
+					   ELSIF mxSLOT1 AND NOT mxSLOT2 THEN 
+						   gvl.qsOrderFornextAssembly:='Red Octagon';
+					    TASK:=3900;
+					   ELSIF NOT mxSLOT1 AND mxSLOT2 THEN 
+						   gvl.qsOrderFornextAssembly:='Red Cylinder';
+					    TASk:=3900;
+					   ELSIF NOT mxSLOT1 AND NOT mxSLOT2 THEN
+						  gvl.qsOrderFornextAssembly:='Red Cylinder';
+					    TASK:=3900; 
+				   END_IF
+				   
+		ELSIF MAIN.qsContainer='Blue Container' THEN
+			IF mxSLOT1 AND mxSLOT2 THEN 
+					   gvl.qsOrderFornextAssembly:='Assembled Product';
+					   TASK:=3900;
+					   ELSIF mxSLOT1 AND NOT mxSLOT2 THEN 
+						   gvl.qsOrderFornextAssembly:='Blue Octagon';
+					    TASK:=3900;
+					   ELSIF NOT mxSLOT1 AND mxSLOT2 THEN 
+						   gvl.qsOrderFornextAssembly:='Blue Cylinder';
+					    TASk:=3900;
+					   ELSIF NOT mxSLOT1 AND NOT mxSLOT2 THEN
+						  gvl.qsOrderFornextAssembly:='Blue Cylinder';
+					    TASK:=3900; 
+				   END_IF
+		
+		END_IF
+		
+	3900:
+		IF ABB_Control_FB.ixFinishOrder THEN
+			ABB_Control_FB.mxAsse_1_done:=FALSE;
+			ABB_Control_FB.mxAsse_2_done:=FALSE;
+			ABB_Control_FB.mxAsse_3_done:=FALSE;
+			GVL.qsOrderFornextAssembly:='0';
+			TASK:=1000;
+		END_IF
+		
+	2001: // Emergency Stop
+		ABB_Control_FB.qxScanBuffer_1:=FALSE;
+		ABB_Control_FB.qxScanBuffer_2:=FALSE;
+		ABB_Control_FB.qxScanBuffer_3:=FALSE;
+		ABB_Control_FB.ixGoTo_AGV:=FALSE;
+		ABB_Control_FB.qxCon1:=FALSE;
+		ABB_Control_FB.qxCon2:=FALSE;
+		ABB_Control_FB.qxCon3:=FALSE;
+		ABB_Control_FB.qxPart_1_Assemble:=FALSE;
+		ABB_Control_FB.qxPart_2_Assemble:=FALSE;
+		ABB_Control_FB.qxPart_3_Assemble:=FALSE;
+		ABB_Control_FB.qxAssemblyDone:=FALSE;
+	 
+	
+END_CASE
+]]></ST>
+    </Implementation>
+    <LineIds Name="Scanner_FB">
+      <LineId Id="10" Count="0" />
+      <LineId Id="333" Count="0" />
+      <LineId Id="359" Count="0" />
+      <LineId Id="334" Count="3" />
+      <LineId Id="358" Count="0" />
+      <LineId Id="343" Count="1" />
+      <LineId Id="346" Count="1" />
+      <LineId Id="349" Count="1" />
+      <LineId Id="348" Count="0" />
+      <LineId Id="1705" Count="2" />
+      <LineId Id="2237" Count="2" />
+      <LineId Id="2233" Count="0" />
+      <LineId Id="345" Count="0" />
+      <LineId Id="356" Count="0" />
+      <LineId Id="1708" Count="1" />
+      <LineId Id="357" Count="0" />
+      <LineId Id="354" Count="1" />
+      <LineId Id="360" Count="0" />
+      <LineId Id="405" Count="0" />
+      <LineId Id="451" Count="0" />
+      <LineId Id="406" Count="1" />
+      <LineId Id="361" Count="0" />
+      <LineId Id="223" Count="32" />
+      <LineId Id="362" Count="0" />
+      <LineId Id="1656" Count="1" />
+      <LineId Id="1659" Count="1" />
+      <LineId Id="1658" Count="0" />
+      <LineId Id="1655" Count="0" />
+      <LineId Id="363" Count="2" />
+      <LineId Id="2240" Count="1" />
+      <LineId Id="2251" Count="2" />
+      <LineId Id="2249" Count="1" />
+      <LineId Id="366" Count="3" />
+      <LineId Id="452" Count="0" />
+      <LineId Id="408" Count="0" />
+      <LineId Id="370" Count="1" />
+      <LineId Id="373" Count="1" />
+      <LineId Id="372" Count="0" />
+      <LineId Id="375" Count="1" />
+      <LineId Id="409" Count="1" />
+      <LineId Id="453" Count="0" />
+      <LineId Id="411" Count="2" />
+      <LineId Id="377" Count="0" />
+      <LineId Id="257" Count="32" />
+      <LineId Id="1661" Count="0" />
+      <LineId Id="1663" Count="3" />
+      <LineId Id="1662" Count="0" />
+      <LineId Id="378" Count="3" />
+      <LineId Id="2254" Count="1" />
+      <LineId Id="2258" Count="2" />
+      <LineId Id="2256" Count="1" />
+      <LineId Id="382" Count="3" />
+      <LineId Id="454" Count="0" />
+      <LineId Id="414" Count="0" />
+      <LineId Id="386" Count="1" />
+      <LineId Id="389" Count="1" />
+      <LineId Id="388" Count="0" />
+      <LineId Id="391" Count="1" />
+      <LineId Id="415" Count="1" />
+      <LineId Id="455" Count="0" />
+      <LineId Id="417" Count="2" />
+      <LineId Id="290" Count="33" />
+      <LineId Id="1667" Count="0" />
+      <LineId Id="1669" Count="3" />
+      <LineId Id="1668" Count="0" />
+      <LineId Id="324" Count="0" />
+      <LineId Id="394" Count="2" />
+      <LineId Id="2261" Count="1" />
+      <LineId Id="2265" Count="2" />
+      <LineId Id="2263" Count="1" />
+      <LineId Id="456" Count="4" />
+      <LineId Id="1033" Count="0" />
+      <LineId Id="461" Count="3" />
+      <LineId Id="1601" Count="0" />
+      <LineId Id="1572" Count="0" />
+      <LineId Id="1593" Count="1" />
+      <LineId Id="465" Count="2" />
+      <LineId Id="469" Count="1" />
+      <LineId Id="468" Count="0" />
+      <LineId Id="397" Count="1" />
+      <LineId Id="471" Count="1" />
+      <LineId Id="1600" Count="0" />
+      <LineId Id="473" Count="0" />
+      <LineId Id="476" Count="1" />
+      <LineId Id="973" Count="0" />
+      <LineId Id="479" Count="2" />
+      <LineId Id="1001" Count="2" />
+      <LineId Id="1005" Count="0" />
+      <LineId Id="1004" Count="0" />
+      <LineId Id="482" Count="9" />
+      <LineId Id="474" Count="1" />
+      <LineId Id="221" Count="0" />
+      <LineId Id="493" Count="0" />
+      <LineId Id="1065" Count="0" />
+      <LineId Id="1545" Count="1" />
+      <LineId Id="2268" Count="1" />
+      <LineId Id="2272" Count="2" />
+      <LineId Id="2270" Count="1" />
+      <LineId Id="1569" Count="1" />
+      <LineId Id="1544" Count="0" />
+      <LineId Id="1558" Count="10" />
+      <LineId Id="1052" Count="0" />
+      <LineId Id="537" Count="11" />
+      <LineId Id="550" Count="0" />
+      <LineId Id="552" Count="2" />
+      <LineId Id="551" Count="0" />
+      <LineId Id="549" Count="0" />
+      <LineId Id="492" Count="0" />
+      <LineId Id="555" Count="1" />
+      <LineId Id="1639" Count="0" />
+      <LineId Id="558" Count="7" />
+      <LineId Id="567" Count="0" />
+      <LineId Id="569" Count="2" />
+      <LineId Id="568" Count="0" />
+      <LineId Id="566" Count="0" />
+      <LineId Id="580" Count="1" />
+      <LineId Id="585" Count="4" />
+      <LineId Id="1218" Count="0" />
+      <LineId Id="591" Count="0" />
+      <LineId Id="593" Count="1" />
+      <LineId Id="596" Count="2" />
+      <LineId Id="1220" Count="0" />
+      <LineId Id="599" Count="5" />
+      <LineId Id="1221" Count="0" />
+      <LineId Id="605" Count="6" />
+      <LineId Id="592" Count="0" />
+      <LineId Id="614" Count="0" />
+      <LineId Id="612" Count="0" />
+      <LineId Id="615" Count="0" />
+      <LineId Id="1222" Count="0" />
+      <LineId Id="619" Count="5" />
+      <LineId Id="1223" Count="0" />
+      <LineId Id="625" Count="5" />
+      <LineId Id="1224" Count="0" />
+      <LineId Id="631" Count="5" />
+      <LineId Id="618" Count="0" />
+      <LineId Id="617" Count="0" />
+      <LineId Id="637" Count="1" />
+      <LineId Id="641" Count="0" />
+      <LineId Id="1225" Count="0" />
+      <LineId Id="642" Count="5" />
+      <LineId Id="1226" Count="0" />
+      <LineId Id="648" Count="5" />
+      <LineId Id="1227" Count="0" />
+      <LineId Id="654" Count="6" />
+      <LineId Id="640" Count="0" />
+      <LineId Id="661" Count="0" />
+      <LineId Id="2275" Count="1" />
+      <LineId Id="2279" Count="2" />
+      <LineId Id="2277" Count="1" />
+      <LineId Id="583" Count="0" />
+      <LineId Id="662" Count="0" />
+      <LineId Id="664" Count="1" />
+      <LineId Id="670" Count="0" />
+      <LineId Id="1121" Count="0" />
+      <LineId Id="1431" Count="0" />
+      <LineId Id="668" Count="1" />
+      <LineId Id="671" Count="2" />
+      <LineId Id="1122" Count="0" />
+      <LineId Id="1433" Count="0" />
+      <LineId Id="674" Count="4" />
+      <LineId Id="1123" Count="0" />
+      <LineId Id="1434" Count="0" />
+      <LineId Id="679" Count="1" />
+      <LineId Id="666" Count="0" />
+      <LineId Id="857" Count="0" />
+      <LineId Id="1247" Count="0" />
+      <LineId Id="1249" Count="76" />
+      <LineId Id="1248" Count="0" />
+      <LineId Id="2282" Count="1" />
+      <LineId Id="2286" Count="2" />
+      <LineId Id="2284" Count="1" />
+      <LineId Id="1348" Count="0" />
+      <LineId Id="1350" Count="78" />
+      <LineId Id="1349" Count="0" />
+      <LineId Id="2289" Count="1" />
+      <LineId Id="2293" Count="2" />
+      <LineId Id="2291" Count="1" />
+      <LineId Id="1326" Count="1" />
+      <LineId Id="1329" Count="17" />
+      <LineId Id="1328" Count="0" />
+      <LineId Id="1246" Count="0" />
+      <LineId Id="930" Count="3" />
+      <LineId Id="1127" Count="0" />
+      <LineId Id="1439" Count="0" />
+      <LineId Id="934" Count="4" />
+      <LineId Id="1128" Count="0" />
+      <LineId Id="1441" Count="0" />
+      <LineId Id="939" Count="4" />
+      <LineId Id="1129" Count="0" />
+      <LineId Id="1442" Count="0" />
+      <LineId Id="944" Count="1" />
+      <LineId Id="858" Count="0" />
+      <LineId Id="1079" Count="1" />
+      <LineId Id="1120" Count="0" />
+      <LineId Id="1139" Count="0" />
+      <LineId Id="1189" Count="0" />
+      <LineId Id="1142" Count="1" />
+      <LineId Id="1145" Count="2" />
+      <LineId Id="1190" Count="0" />
+      <LineId Id="1153" Count="0" />
+      <LineId Id="1144" Count="0" />
+      <LineId Id="1131" Count="0" />
+      <LineId Id="1081" Count="2" />
+      <LineId Id="1086" Count="7" />
+      <LineId Id="1085" Count="0" />
+      <LineId Id="1106" Count="0" />
+      <LineId Id="1108" Count="0" />
+      <LineId Id="1429" Count="1" />
+      <LineId Id="1443" Count="1" />
+      <LineId Id="1446" Count="0" />
+      <LineId Id="1448" Count="0" />
+      <LineId Id="1450" Count="0" />
+      <LineId Id="1452" Count="1" />
+      <LineId Id="1447" Count="0" />
+      <LineId Id="1454" Count="3" />
+      <LineId Id="1459" Count="0" />
+      <LineId Id="1461" Count="2" />
+      <LineId Id="1458" Count="0" />
+      <LineId Id="1464" Count="3" />
+      <LineId Id="1469" Count="0" />
+      <LineId Id="1472" Count="5" />
+      <LineId Id="1480" Count="0" />
+      <LineId Id="1478" Count="1" />
+      <LineId Id="1481" Count="0" />
+      <LineId Id="1470" Count="0" />
+      <LineId Id="1482" Count="0" />
+      <LineId Id="1484" Count="12" />
+      <LineId Id="1483" Count="0" />
+      <LineId Id="1497" Count="0" />
+      <LineId Id="1499" Count="12" />
+      <LineId Id="1498" Count="0" />
+      <LineId Id="1468" Count="0" />
+      <LineId Id="1445" Count="0" />
+      <LineId Id="1132" Count="1" />
+      <LineId Id="1148" Count="0" />
+      <LineId Id="1576" Count="10" />
+      <LineId Id="1575" Count="0" />
+      <LineId Id="1188" Count="0" />
+      <LineId Id="1643" Count="0" />
+      <LineId Id="1647" Count="0" />
+      <LineId Id="1644" Count="0" />
+      <LineId Id="1648" Count="0" />
+      <LineId Id="1645" Count="0" />
+      <LineId Id="1649" Count="1" />
+      <LineId Id="1149" Count="0" />
+      <LineId Id="1591" Count="1" />
+      <LineId Id="1590" Count="0" />
+      <LineId Id="1159" Count="1" />
+      <LineId Id="1156" Count="0" />
+      <LineId Id="1158" Count="0" />
+      <LineId Id="1157" Count="0" />
+      <LineId Id="1651" Count="0" />
+      <LineId Id="1154" Count="1" />
+      <LineId Id="1710" Count="7" />
+      <LineId Id="1719" Count="1" />
+      <LineId Id="1722" Count="63" />
+      <LineId Id="1787" Count="1" />
+      <LineId Id="1790" Count="0" />
+      <LineId Id="1792" Count="0" />
+      <LineId Id="1794" Count="3" />
+      <LineId Id="1793" Count="0" />
+      <LineId Id="1786" Count="0" />
+      <LineId Id="1799" Count="10" />
+      <LineId Id="1811" Count="15" />
+      <LineId Id="1810" Count="0" />
+      <LineId Id="1718" Count="0" />
+      <LineId Id="1827" Count="3" />
+      <LineId Id="1832" Count="2" />
+      <LineId Id="1831" Count="0" />
+      <LineId Id="1836" Count="3" />
+      <LineId Id="1841" Count="2" />
+      <LineId Id="1840" Count="0" />
+      <LineId Id="1845" Count="3" />
+      <LineId Id="1850" Count="2" />
+      <LineId Id="1849" Count="0" />
+      <LineId Id="1853" Count="3" />
+      <LineId Id="1858" Count="2" />
+      <LineId Id="1857" Count="0" />
+      <LineId Id="1861" Count="3" />
+      <LineId Id="1866" Count="2" />
+      <LineId Id="1865" Count="0" />
+      <LineId Id="1869" Count="1" />
+      <LineId Id="1872" Count="1" />
+      <LineId Id="1875" Count="6" />
+      <LineId Id="1874" Count="0" />
+      <LineId Id="1882" Count="2" />
+      <LineId Id="1887" Count="6" />
+      <LineId Id="1885" Count="1" />
+      <LineId Id="1894" Count="3" />
+      <LineId Id="1899" Count="2" />
+      <LineId Id="1898" Count="0" />
+      <LineId Id="1902" Count="3" />
+      <LineId Id="1907" Count="2" />
+      <LineId Id="1906" Count="0" />
+      <LineId Id="1910" Count="3" />
+      <LineId Id="1915" Count="3" />
+      <LineId Id="1914" Count="0" />
+      <LineId Id="1919" Count="3" />
+      <LineId Id="1924" Count="3" />
+      <LineId Id="1923" Count="0" />
+      <LineId Id="1928" Count="1" />
+      <LineId Id="1931" Count="29" />
+      <LineId Id="1930" Count="0" />
+      <LineId Id="1961" Count="2" />
+      <LineId Id="1965" Count="29" />
+      <LineId Id="1964" Count="0" />
+      <LineId Id="1995" Count="2" />
+      <LineId Id="1999" Count="29" />
+      <LineId Id="1998" Count="0" />
+      <LineId Id="2029" Count="4" />
+      <LineId Id="2035" Count="2" />
+      <LineId Id="2034" Count="0" />
+      <LineId Id="2038" Count="3" />
+      <LineId Id="2043" Count="2" />
+      <LineId Id="2042" Count="0" />
+      <LineId Id="2046" Count="1" />
+      <LineId Id="2049" Count="5" />
+      <LineId Id="2048" Count="0" />
+      <LineId Id="2055" Count="4" />
+      <LineId Id="2061" Count="0" />
+      <LineId Id="2063" Count="6" />
+      <LineId Id="2062" Count="0" />
+      <LineId Id="2060" Count="0" />
+      <LineId Id="2072" Count="1" />
+      <LineId Id="2075" Count="10" />
+      <LineId Id="2074" Count="0" />
+      <LineId Id="2086" Count="1" />
+      <LineId Id="2089" Count="10" />
+      <LineId Id="2088" Count="0" />
+      <LineId Id="2100" Count="3" />
+      <LineId Id="2105" Count="0" />
+      <LineId Id="2107" Count="1" />
+      <LineId Id="2104" Count="0" />
+      <LineId Id="2109" Count="1" />
+      <LineId Id="2112" Count="4" />
+      <LineId Id="2111" Count="0" />
+      <LineId Id="2118" Count="1" />
+      <LineId Id="2121" Count="4" />
+      <LineId Id="2120" Count="0" />
+      <LineId Id="2126" Count="2" />
+      <LineId Id="2131" Count="1" />
+      <LineId Id="2134" Count="1" />
+      <LineId Id="2137" Count="1" />
+      <LineId Id="2140" Count="1" />
+      <LineId Id="2129" Count="1" />
+      <LineId Id="2142" Count="3" />
+      <LineId Id="2147" Count="0" />
+      <LineId Id="2149" Count="2" />
+      <LineId Id="2146" Count="0" />
+      <LineId Id="2152" Count="3" />
+      <LineId Id="2157" Count="0" />
+      <LineId Id="2159" Count="2" />
+      <LineId Id="2156" Count="0" />
+      <LineId Id="2162" Count="0" />
+      <LineId Id="2164" Count="1" />
+      <LineId Id="2168" Count="11" />
+      <LineId Id="2166" Count="0" />
+      <LineId Id="2180" Count="0" />
+      <LineId Id="2183" Count="12" />
+      <LineId Id="2182" Count="0" />
+      <LineId Id="2196" Count="0" />
+      <LineId Id="2198" Count="12" />
+      <LineId Id="2197" Count="0" />
+      <LineId Id="2181" Count="0" />
+      <LineId Id="2167" Count="0" />
+      <LineId Id="2211" Count="3" />
+      <LineId Id="2216" Count="3" />
+      <LineId Id="2215" Count="0" />
+      <LineId Id="2220" Count="12" />
+      <LineId Id="2163" Count="0" />
+      <LineId Id="663" Count="0" />
+      <LineId Id="222" Count="0" />
+      <LineId Id="212" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
